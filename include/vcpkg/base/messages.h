@@ -279,6 +279,7 @@ namespace vcpkg::msg
     DECLARE_MSG_ARG(version, "1.3.8");
     DECLARE_MSG_ARG(action_index, "340");
     DECLARE_MSG_ARG(env_var, "VCPKG_DEFAULT_TRIPLET");
+    DECLARE_MSG_ARG(cmake_var, "VCPKG_POLICY_ALLOW_RESTRICTED_HEADERS");
 #undef DECLARE_MSG_ARG
 
 // These are `...` instead of

@@ -14,6 +14,24 @@ using vcpkg::Build::BuildInfo;
 using vcpkg::Build::BuildPolicy;
 using vcpkg::Build::PreBuildInfo;
 
+namespace
+{
+    using namespace vcpkg;
+
+    DECLARE_AND_REGISTER_MESSAGE(PerformPostBuildLint,
+                                 (),
+                                 "'--' at the befinning must be preserved",
+                                 "-- Performing post-build validation");
+    DECLARE_AND_REGISTER_MESSAGE(PerformPostBuildLintDone,
+                                 (),
+                                 "'--' at the befinning must be preserved",
+                                 "-- Performing post-build validation done");
+    DECLARE_AND_REGISTER_MESSAGE(PerformPostBuildLintReport,
+                                 (msg::count),
+                                 "",
+                                 "Found {count} post-build check problem(s). To submit these ports to curated catalogs, please first correct the portfile:");
+}
+
 namespace vcpkg::PostBuildLint
 {
     constexpr static const StringLiteral windows_system_names[] = {
@@ -71,6 +89,7 @@ namespace vcpkg::PostBuildLint
         // Default case for all version >= VS 2015.
         return V_NO_MSVCRT;
     }
+
 
     static LintStatus check_for_files_in_include_directory(const Filesystem& fs,
                                                            const Build::BuildPolicies& policies,
@@ -381,8 +400,8 @@ namespace vcpkg::PostBuildLint
             found_relative_native.erase(current_buildtrees_dir.native().size() +
                                         1); // The +1 is needed to remove the "/"
             const Path relative_path = found_relative_native;
-            vcpkg::printf("\n    configure_file(\"${CURRENT_BUILDTREES_DIR}/%s/%s\" "
-                          "\"${CURRENT_PACKAGES_DIR}/share/%s/copyright\" COPYONLY)\n",
+            vcpkg::printf("\n    file(INSTALL \"${CURRENT_BUILDTREES_DIR}/%s/%s\" DESTINATION "
+                          "\"${CURRENT_PACKAGES_DIR}/share/%s RENAME copyright\")\n",
                           relative_path.generic_u8string(),
                           found_file.filename(),
                           spec.name());
@@ -446,7 +465,7 @@ namespace vcpkg::PostBuildLint
         return LintStatus::SUCCESS;
     }
 
-    static LintStatus check_uwp_bit_of_dlls(const std::string& expected_system_name,
+    static LintStatus check_uwp_bit_of_dlls(StringView expected_system_name,
                                             const std::vector<Path>& dlls,
                                             const Path dumpbin_exe)
     {
@@ -1020,6 +1039,7 @@ namespace vcpkg::PostBuildLint
             return error_count;
         }
 
+
         error_count += check_for_files_in_include_directory(fs, build_info.policies, package_dir);
         error_count += check_for_restricted_include_files(fs, build_info.policies, package_dir);
         error_count += check_for_files_in_debug_include_directory(fs, package_dir);
@@ -1142,22 +1162,22 @@ namespace vcpkg::PostBuildLint
                               const BuildInfo& build_info,
                               const Path& port_dir)
     {
-        print2("-- Performing post-build validation\n");
+        msg::println(msgPerformPostBuildLint);
         const size_t error_count = perform_all_checks_and_return_error_count(spec, paths, pre_build_info, build_info);
 
         if (error_count != 0)
         {
             const auto portfile = port_dir / "portfile.cmake";
-            print2(Color::error,
-                   "Found ",
-                   error_count,
-                   " post-build check problem(s). To submit these ports to curated catalogs, please first correct the "
-                   "portfile:\n    ",
-                   portfile,
-                   "\n");
+            msg::print_error(
+                msg::format(
+                    msgPerformPostBuildLintReport,
+                    msg::count = error_count)
+                .appendnl()
+                .append_indent()
+                .append_raw(portfile));
         }
 
-        print2("-- Performing post-build validation done\n");
+        msg::println(msgPerformPostBuildLintDone);
 
         return error_count;
     }
