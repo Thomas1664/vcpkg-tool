@@ -172,10 +172,10 @@ namespace vcpkg::Commands::FormatManifest
     static constexpr StringLiteral OPTION_ALL = "all";
     static constexpr StringLiteral OPTION_CONVERT_CONTROL = "convert-control";
 
-    const CommandSwitch FORMAT_SWITCHES[] = {
+    static constexpr std::array<CommandSwitch, 2> FORMAT_SWITCHES = {{
         {OPTION_ALL, "Format all ports' manifest files."},
         {OPTION_CONVERT_CONTROL, "Convert CONTROL files to manifest files."},
-    };
+    }};
 
     const CommandStructure COMMAND_STRUCTURE = {
         create_example_string(R"###(format-manifest --all)###"),

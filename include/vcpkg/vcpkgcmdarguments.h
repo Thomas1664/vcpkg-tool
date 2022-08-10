@@ -68,6 +68,33 @@ namespace vcpkg
 
     struct CommandStructure
     {
+        template<::size_t N>
+        CommandStructure(StringArray<N> example_txt,
+                         size_t min,
+                         size_t max,
+                         const CommandOptionsStructure& opts,
+                         std::vector<std::string> (*valid_args)(const VcpkgPaths& paths))
+            : example_text(example_txt.begin(), example_txt.end()) 
+            , minimum_arity(min)
+            , maximum_arity(max)
+            , options(opts)
+            , valid_arguments(valid_args)
+        {
+        }
+
+        CommandStructure(std::string&& example_txt,
+                         size_t min,
+                         size_t max,
+                         const CommandOptionsStructure& opts,
+                         std::vector<std::string> (*valid_args)(const VcpkgPaths& paths))
+            : example_text(std::move(example_txt))
+            , minimum_arity(min)
+            , maximum_arity(max)
+            , options(opts)
+            , valid_arguments(valid_args)
+        {
+        }
+
         std::string example_text;
 
         size_t minimum_arity;
@@ -87,7 +114,13 @@ namespace vcpkg
     using CommandLineCharType = char;
 #endif
 
-    std::string create_example_string(const std::string& command_and_arguments);
+    //std::string create_example_string(const std::string& command_and_arguments);
+
+    template<::size_t N>
+    constexpr auto create_example_string(const char (&command_and_arguments)[N]) noexcept
+    {
+        return StringArray{"Example:\n  vcpkg "} + StringArray{command_and_arguments} + StringArray{"\n"};
+    }
 
     struct HelpTableFormatter
     {

@@ -899,13 +899,12 @@ namespace vcpkg
         return Optional<std::string>(std::move(asset_sources_template));
     }
 
-    std::string create_example_string(const std::string& command_and_arguments)
+    /* std::string create_example_string(const std::string& command_and_arguments)
     {
-        std::string cs = Strings::format("Example:\n"
-                                         "  vcpkg %s\n",
-                                         command_and_arguments);
-        return cs;
-    }
+        return Strings::format("Example:\n"
+                               "  vcpkg %s\n",
+                               command_and_arguments);
+    } */
 
     static void help_table_newline_indent(std::string& target)
     {

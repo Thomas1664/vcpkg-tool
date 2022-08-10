@@ -30,9 +30,8 @@ namespace vcpkg::Commands::X_Download
     };
 
     const CommandStructure COMMAND_STRUCTURE = {
-        Strings::format("%s\n%s",
-                        create_example_string("x-download <filepath> [--sha512=]<sha512> [--url=https://...]..."),
-                        create_example_string("x-download <filepath> --skip-sha512 [--url=https://...]...")),
+        create_example_string("x-download <filepath> [--sha512=]<sha512> [--url=https://...]...")+"\n"
+        + create_example_string("x-download <filepath> --skip-sha512 [--url=https://...]..."),
         1,
         2,
         {FETCH_SWITCHES, FETCH_SETTINGS, FETCH_MULTISETTINGS},

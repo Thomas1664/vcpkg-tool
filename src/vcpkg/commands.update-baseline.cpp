@@ -17,11 +17,7 @@ namespace vcpkg::Commands
     };
 
     static const CommandStructure COMMAND_STRUCTURE{
-        create_example_string("x-update-baseline"),
-        0,
-        0,
-        {switches},
-    };
+        create_example_string("x-update-baseline"), 0, 0, {switches}, nullptr};
 
     static void update_baseline_in_config(const VcpkgPaths& paths, RegistryConfig& reg)
     {

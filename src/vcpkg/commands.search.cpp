@@ -13,9 +13,8 @@ namespace vcpkg::Commands
     static constexpr std::array<CommandSwitch, 1> SearchSwitches = {{{OPTION_FULLDESC, "Do not truncate long text"}}};
 
     const CommandStructure SearchCommandStructure = {
-        Strings::format(
-            "The argument should be a substring to search for, or no argument to display all libraries.\n%s",
-            create_example_string("search png")),
+        "The argument should be a substring to search for, or no argument to display all libraries.\n"+
+            create_example_string("search png"),
         0,
         1,
         {SearchSwitches, {}},

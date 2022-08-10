@@ -23,19 +23,19 @@ namespace
     static constexpr StringLiteral OPTION_VERSION_DATE = "version-date";
     static constexpr StringLiteral OPTION_VERSION_STRING = "version-string";
 
-    const CommandSwitch SWITCHES[] = {
+    static constexpr std::array<CommandSwitch, 5> SWITCHES = {{
         {OPTION_APPLICATION, "Create an application manifest (don't require name or version)."},
         {OPTION_SINGLE_FILE, "Embed vcpkg-configuration.json into vcpkg.json."},
         {OPTION_VERSION_RELAXED,
          "Interpret --version as a relaxed-numeric version. (Nonnegative numbers separated by dots)"},
         {OPTION_VERSION_DATE, "Interpret --version as an ISO 8601 date. (YYYY-MM-DD)"},
         {OPTION_VERSION_STRING, "Interpret --version as a string with no ordering behavior."},
-    };
+    }};
 
-    const CommandSetting SETTINGS[] = {
+    static constexpr std::array<CommandSetting, 2> SETTINGS = {{
         {SETTING_NAME, "Name for the new manifest."},
         {SETTING_VERSION, "Version for the new manifest."},
-    };
+    }};
 
     const CommandStructure COMMAND_STRUCTURE = {
         create_example_string(R"###(new --name=example --version=1.0 --version-kind=relaxed)###"),

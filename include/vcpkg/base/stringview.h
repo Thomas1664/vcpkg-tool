@@ -135,9 +135,15 @@ namespace vcpkg
         constexpr char operator[](::size_t pos) const noexcept { return m_array[pos]; }
         constexpr char& operator[](::size_t pos) noexcept { return m_array[pos]; }
 
+        explicit operator StringView() const { return StringView{begin(), end()}; }
+
         template<::size_t L, ::size_t R>
         friend constexpr StringArray<L + R - 1> operator+(const StringArray<L> lhs, const StringArray<R> rhs) noexcept;
 
+        template<::size_t L, ::size_t R>
+        friend constexpr StringArray<L + R - 1> operator+(const char (&lhs)[L], const StringArray<R> rhs) noexcept;
+        template<::size_t L, ::size_t R>
+        friend constexpr StringArray<L + R - 1> operator+(const StringArray<L> lhs, const char (&rhs)[R]) noexcept;
     private:
         std::array<char, N> m_array;
     };
@@ -149,5 +155,15 @@ namespace vcpkg
         auto it = constexpr_copy(lhs.begin(), lhs.end(), out.begin());
         constexpr_copy(rhs.begin(), rhs.end(), it);
         return out;
+    }
+    template<::size_t L, ::size_t R>
+    constexpr StringArray<L + R - 1> operator+(const char (&lhs)[L], const StringArray<R> rhs) noexcept
+    {
+        return operator+(StringArray{lhs}, rhs);
+    }
+    template<::size_t L, ::size_t R>
+    constexpr StringArray<L + R - 1> operator+(const StringArray<L> lhs, const char (&rhs)[R]) noexcept
+    {
+        return operator+(lhs, StringArray{rhs});
     }
 }

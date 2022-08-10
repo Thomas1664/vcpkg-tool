@@ -310,13 +310,13 @@ namespace
 
 namespace vcpkg::Commands::AddVersion
 {
-    const CommandSwitch COMMAND_SWITCHES[] = {
+    static constexpr std::array<CommandSwitch, 5> COMMAND_SWITCHES = {{
         {OPTION_ALL, "Process versions for all ports."},
         {OPTION_OVERWRITE_VERSION, "Overwrite `git-tree` of an existing version."},
         {OPTION_SKIP_FORMATTING_CHECK, "Skips the formatting check of vcpkg.json files."},
         {OPTION_SKIP_VERSION_FORMAT_CHECK, "Skips the version format check."},
-        {OPTION_VERBOSE, "Print success messages instead of just errors."},
-    };
+        {OPTION_VERBOSE, "Print success messages instead of just errors."}
+    }};
 
     const CommandStructure COMMAND_STRUCTURE{
         create_example_string(R"###(x-add-version <port name>)###"),

@@ -142,7 +142,7 @@ namespace vcpkg::Commands::PortHistory
 
     static constexpr StringLiteral OPTION_OUTPUT_FILE = "output";
 
-    static const CommandSetting HISTORY_SETTINGS[] = {
+    static constexpr CommandSetting HISTORY_SETTINGS[] = {
         {OPTION_OUTPUT_FILE, "Write output to a file"},
     };
 

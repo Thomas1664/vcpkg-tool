@@ -11,7 +11,7 @@ namespace vcpkg::Commands::Fetch
         "Direct status/downloading messages to stderr rather than stdout. (Errors/failures still go to stdout)"};
 
     const CommandStructure COMMAND_STRUCTURE = {
-        Strings::format("The argument should be a tool name\n%s", create_example_string("fetch cmake")),
+        "The argument should be a tool name\n" + create_example_string("fetch cmake"),
         1,
         1,
         {{&STDERR_STATUS, 1}},
