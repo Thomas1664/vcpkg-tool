@@ -73,7 +73,7 @@ namespace vcpkg
     using CommandLineCharType = char;
 #endif
 
-    std::string create_example_string(const std::string& command_and_arguments);
+    std::string create_example_string(StringLiteral command_and_arguments);
 
     struct FeatureFlagSettings
     {

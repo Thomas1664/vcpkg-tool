@@ -958,12 +958,11 @@ namespace vcpkg
         return Optional<std::string>(std::move(asset_sources_template));
     }
 
-    std::string create_example_string(const std::string& command_and_arguments)
+    std::string create_example_string(StringLiteral command_and_arguments)
     {
-        std::string cs = Strings::format("Example:\n"
-                                         "  vcpkg %s\n",
-                                         command_and_arguments);
-        return cs;
+        return Strings::format("Example:\n"
+                               "  vcpkg %s\n",
+                               command_and_arguments);
     }
 
     // out-of-line definitions since C++14 doesn't allow inline constexpr static variables
