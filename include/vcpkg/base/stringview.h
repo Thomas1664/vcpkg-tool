@@ -6,7 +6,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <array>
 #include <iterator>
 #include <limits>
 #include <string>
@@ -18,8 +17,13 @@ namespace vcpkg
         constexpr StringView() = default;
         StringView(const std::string& s) noexcept; // Implicit by design
         StringView(const char* ptr) noexcept : m_ptr(ptr), m_size(strlen(ptr)) { }
+        StringView(int) = delete;
+        //template<typename T, typename = std::enable_if_t<std::is_same_v<T, const char*>>>
         constexpr StringView(const char* ptr, size_t size) noexcept : m_ptr(ptr), m_size(size) { }
+        constexpr StringView(int ptr, size_t size) noexcept = delete;
+        //template<typename T, typename = std::enable_if_t<std::is_same_v<T, const char*>>>
         constexpr StringView(const char* b, const char* e) noexcept : m_ptr(b), m_size(static_cast<size_t>(e - b)) { }
+        constexpr StringView(int b, int e) noexcept = delete;
 
         constexpr const char* begin() const noexcept { return m_ptr; }
         constexpr const char* end() const noexcept { return m_ptr + m_size; }

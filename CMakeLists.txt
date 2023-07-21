@@ -214,7 +214,7 @@ elseif(VCPKG_OFFICIAL_BUILD)
 endif()
 
 file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg-artifacts" VCPKG_ARTIFACTS_SOURCE_DIR)
-if (VCPKG_ARTIFACTS_DEVELOPMENT)
+if (0)
     file(TO_CMAKE_PATH "${CMAKE_CURRENT_BINARY_DIR}/vcpkg-artifacts" VCPKG_ARTIFACTS_BINARY_DIR)
     # The directory constructed by this portion of the build script needs to be kept in sync with
     # that created by azure-pipelines/signing.yml
