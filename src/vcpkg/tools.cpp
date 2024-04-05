@@ -182,13 +182,19 @@ namespace vcpkg
 
     struct ToolProvider
     {
-        virtual StringView tool_data_name() const = 0;
+        ToolProvider(StringView name, std::array<int, 3>&& min_version, bool abi_sensitive = false)
+            : name(name), default_min_version(std::move(min_version)), is_abi_sensitive(abi_sensitive)
+        {
+        }
+        StringView name;
+        std::array<int, 3> default_min_version;
+        /// \c true if the tool's version is included in package ABI calculations. ABI sensitive tools will be
+        /// pinned to exact versions if \c --x-abi-tools-use-exact-versions is passed.
+        bool is_abi_sensitive;
+
         /// \returns The stem of the executable to search PATH for, or empty string if tool can't be searched
         virtual std::vector<StringView> system_exe_stems() const { return std::vector<StringView>{}; }
-        virtual std::array<int, 3> default_min_version() const = 0;
-        /// \returns \c true if the tool's version is included in package ABI calculations. ABI sensitive tools will be
-        /// pinned to exact versions if \c --x-abi-tools-use-exact-versions is passed.
-        virtual bool is_abi_sensitive() const = 0;
+
         /// \returns \c true if and only if it is impossible to retrieve the tool's version, and thus it should not be
         // considered.
         virtual bool ignore_version() const { return false; }
@@ -218,13 +224,8 @@ namespace vcpkg
 
     struct GenericToolProvider : ToolProvider
     {
-        explicit GenericToolProvider(StringView tool) : m_tool_data_name(tool) { }
+        explicit GenericToolProvider(StringView tool) : ToolProvider(tool, {0}) { }
 
-        const StringView m_tool_data_name;
-
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return m_tool_data_name; }
-        virtual std::array<int, 3> default_min_version() const override { return {0}; }
         virtual bool ignore_version() const override { return true; }
 
         virtual ExpectedL<std::string> get_version(const ToolCache&, MessageSink&, const Path&) const override
@@ -235,10 +236,8 @@ namespace vcpkg
 
     struct CMakeProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return true; }
-        virtual StringView tool_data_name() const override { return Tools::CMAKE; }
+        CMakeProvider() : ToolProvider(Tools::CMAKE, {3, 17, 1}, true) { }
         virtual std::vector<StringView> system_exe_stems() const override { return {Tools::CMAKE}; }
-        virtual std::array<int, 3> default_min_version() const override { return {3, 17, 1}; }
 
 #if defined(_WIN32)
         virtual void add_system_paths(const ReadOnlyFilesystem&, std::vector<Path>& out_candidate_paths) const override
@@ -274,10 +273,8 @@ namespace vcpkg
 
     struct NinjaProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return Tools::NINJA; }
+        NinjaProvider() : ToolProvider(Tools::NINJA, {3, 5, 1}) { }
         virtual std::vector<StringView> system_exe_stems() const override { return {Tools::NINJA}; }
-        virtual std::array<int, 3> default_min_version() const override { return {3, 5, 1}; }
 
         virtual ExpectedL<std::string> get_version(const ToolCache&, MessageSink&, const Path& exe_path) const override
         {
@@ -288,10 +285,8 @@ namespace vcpkg
 
     struct NuGetProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return Tools::NUGET; }
+        NuGetProvider() : ToolProvider(Tools::NUGET, {4, 6, 2}) { }
         virtual std::vector<StringView> system_exe_stems() const override { return {Tools::NUGET}; }
-        virtual std::array<int, 3> default_min_version() const override { return {4, 6, 2}; }
 
         virtual ExpectedL<std::string> get_version(const ToolCache& cache,
                                                    MessageSink& status_sink,
@@ -323,10 +318,8 @@ namespace vcpkg
 
     struct Aria2Provider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return Tools::ARIA2; }
+        Aria2Provider() : ToolProvider(Tools::ARIA2, {1, 33, 1}) { }
         virtual std::vector<StringView> system_exe_stems() const override { return {"aria2c"}; }
-        virtual std::array<int, 3> default_min_version() const override { return {1, 33, 1}; }
         virtual ExpectedL<std::string> get_version(const ToolCache&, MessageSink&, const Path& exe_path) const override
         {
             return run_to_extract_version(Tools::ARIA2, exe_path, Command(exe_path).string_arg("--version"))
@@ -341,10 +334,8 @@ namespace vcpkg
 
     struct NodeProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return Tools::NODE; }
+        NodeProvider() : ToolProvider(Tools::NODE, {16, 12, 0}) { }
         virtual std::vector<StringView> system_exe_stems() const override { return {Tools::NODE}; }
-        virtual std::array<int, 3> default_min_version() const override { return {16, 12, 0}; }
 
 #if defined(_WIN32)
         virtual void add_system_paths(const ReadOnlyFilesystem&, std::vector<Path>& out_candidate_paths) const override
@@ -368,10 +359,8 @@ namespace vcpkg
 
     struct GitProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return Tools::GIT; }
+        GitProvider() : ToolProvider(Tools::GIT, {2, 7, 4}) { }
         virtual std::vector<StringView> system_exe_stems() const override { return {Tools::GIT}; }
-        virtual std::array<int, 3> default_min_version() const override { return {2, 7, 4}; }
 
 #if defined(_WIN32)
         virtual void add_system_paths(const ReadOnlyFilesystem&, std::vector<Path>& out_candidate_paths) const override
@@ -398,10 +387,8 @@ namespace vcpkg
 
     struct MonoProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return Tools::MONO; }
+        MonoProvider() : ToolProvider(Tools::MONO, {0, 0, 0}) { }
         virtual std::vector<StringView> system_exe_stems() const override { return {Tools::MONO}; }
-        virtual std::array<int, 3> default_min_version() const override { return {0, 0, 0}; }
 
         virtual ExpectedL<std::string> get_version(const ToolCache&, MessageSink&, const Path& exe_path) const override
         {
@@ -429,10 +416,8 @@ namespace vcpkg
 
     struct GsutilProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return Tools::GSUTIL; }
+        GsutilProvider() : ToolProvider(Tools::GSUTIL, {4, 56, 0}) { }
         virtual std::vector<StringView> system_exe_stems() const override { return {Tools::GSUTIL}; }
-        virtual std::array<int, 3> default_min_version() const override { return {4, 56, 0}; }
 
         virtual ExpectedL<std::string> get_version(const ToolCache&, MessageSink&, const Path& exe_path) const override
         {
@@ -447,10 +432,8 @@ namespace vcpkg
 
     struct AwsCliProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return Tools::AWSCLI; }
+        AwsCliProvider() : ToolProvider(Tools::AWSCLI, {2, 4, 4}) { }
         virtual std::vector<StringView> system_exe_stems() const override { return {Tools::AWSCLI}; }
-        virtual std::array<int, 3> default_min_version() const override { return {2, 4, 4}; }
 
         virtual ExpectedL<std::string> get_version(const ToolCache&, MessageSink&, const Path& exe_path) const override
         {
@@ -464,10 +447,8 @@ namespace vcpkg
 
     struct CosCliProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return Tools::COSCLI; }
+        CosCliProvider() : ToolProvider(Tools::COSCLI, {0, 11, 0}) { }
         virtual std::vector<StringView> system_exe_stems() const override { return {"cos"}; }
-        virtual std::array<int, 3> default_min_version() const override { return {0, 11, 0}; }
 
         virtual ExpectedL<std::string> get_version(const ToolCache&, MessageSink&, const Path& exe_path) const override
         {
@@ -482,9 +463,7 @@ namespace vcpkg
 
     struct IfwInstallerBaseProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return "installerbase"; }
-        virtual std::array<int, 3> default_min_version() const override { return {0, 0, 0}; }
+        IfwInstallerBaseProvider() : ToolProvider("installerbase", {0, 0, 0}) { }
 
         virtual ExpectedL<std::string> get_version(const ToolCache&, MessageSink&, const Path& exe_path) const override
         {
@@ -496,18 +475,19 @@ namespace vcpkg
 
     struct PowerShellCoreProvider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override
-        {
-            // This #ifdef is mirrored in build.cpp's compute_abi_tag
+        PowerShellCoreProvider()
+            : ToolProvider(Tools::POWERSHELL_CORE,
+                           {7, 0, 3},
+        // This #ifdef is mirrored in build.cpp's compute_abi_tag
 #if defined(_WIN32)
-            return true;
+                           true
 #else
-            return false;
+                           false
 #endif
+              )
+        {
         }
-        virtual StringView tool_data_name() const override { return Tools::POWERSHELL_CORE; }
         virtual std::vector<StringView> system_exe_stems() const override { return {"pwsh"}; }
-        virtual std::array<int, 3> default_min_version() const override { return {7, 0, 3}; }
 
         virtual ExpectedL<std::string> get_version(const ToolCache&, MessageSink&, const Path& exe_path) const override
         {
@@ -522,10 +502,9 @@ namespace vcpkg
 
     struct Python3Provider : ToolProvider
     {
-        virtual bool is_abi_sensitive() const override { return false; }
-        virtual StringView tool_data_name() const override { return Tools::PYTHON3; }
+        explicit Python3Provider(StringView tool = Tools::PYTHON3)
+            : ToolProvider(tool, {3, 5, 0}) { } // 3.5 added -m venv
         virtual std::vector<StringView> system_exe_stems() const override { return {"python3", "py3", "python", "py"}; }
-        virtual std::array<int, 3> default_min_version() const override { return {3, 5, 0}; } // 3.5 added -m venv
 
 #if defined(_WIN32)
         void add_system_paths_impl(const ReadOnlyFilesystem& fs,
@@ -581,7 +560,7 @@ namespace vcpkg
 
     struct Python3WithVEnvProvider : Python3Provider
     {
-        virtual StringView tool_data_name() const override { return Tools::PYTHON3_WITH_VENV; }
+        Python3WithVEnvProvider() : Python3Provider(Tools::PYTHON3_WITH_VENV) { }
 
         virtual bool is_acceptable(const Path& exe_path) const override
         {
@@ -740,8 +719,7 @@ namespace vcpkg
                 get_environment_variable(EnvironmentVariableVcpkgForceSystemBinaries).has_value();
             const bool env_force_download_binaries =
                 get_environment_variable(EnvironmentVariableVcpkgForceDownloadedBinaries).has_value();
-            const auto maybe_tool_data =
-                parse_tool_data_from_xml(get_config_contents(), xml_config, tool.tool_data_name());
+            const auto maybe_tool_data = parse_tool_data_from_xml(get_config_contents(), xml_config, tool.name);
 
             const bool download_available = maybe_tool_data.has_value() && !maybe_tool_data.get()->url.empty();
             // search for system searchable tools unless forcing downloads and download available
@@ -751,24 +729,23 @@ namespace vcpkg
             // search for downloaded tools unless forcing system search
             const bool consider_downloads = !env_force_system_binaries || !consider_system;
 
-            const bool exact_version = tool.is_abi_sensitive() && abiToolVersionHandling == RequireExactVersions::YES;
+            const bool exact_version = tool.is_abi_sensitive && abiToolVersionHandling == RequireExactVersions::YES;
             // forcing system search also disables version detection
             const bool ignore_version = env_force_system_binaries || tool.ignore_version();
 
             std::vector<Path> candidate_paths;
-            std::array<int, 3> min_version = tool.default_min_version();
-
-            if (auto tool_data = maybe_tool_data.get())
-            {
-                // If there is an entry for the tool in vcpkgTools.xml, use that version as the minimum
-                min_version = tool_data->version;
-
-                if (consider_downloads)
-                {
-                    // If we would consider downloading the tool, prefer the downloaded copy
-                    candidate_paths.push_back(tool_data->exe_path(tools));
-                }
-            }
+            auto min_version = maybe_tool_data
+                                   .map([&](const auto& tool_data) {
+                                       if (consider_downloads)
+                                       {
+                                           // If we would consider downloading the tool, prefer the downloaded copy
+                                           candidate_paths.push_back(tool_data.exe_path(tools));
+                                       }
+                                       // If there is an entry for the tool in vcpkgTools.xml, use that version as the
+                                       // minimum
+                                       return tool_data.version;
+                                   })
+                                   .value_or(tool.default_min_version);
 
             if (consider_system)
             {
@@ -838,7 +815,7 @@ namespace vcpkg
             }
 
             // If no acceptable tool was found and downloading was unavailable, emit an error message
-            LocalizedString s = msg::format_error(msgToolFetchFailed, msg::tool_name = tool.tool_data_name());
+            LocalizedString s = msg::format_error(msgToolFetchFailed, msg::tool_name = tool.name);
             if (env_force_system_binaries && download_available)
             {
                 s.append_raw(' ').append(msgDownloadAvailable,
