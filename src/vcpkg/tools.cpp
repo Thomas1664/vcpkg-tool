@@ -62,10 +62,32 @@ namespace vcpkg
         return std::array<int, 3>{*d1.get(), *d2.get(), *d3.get()};
     }
 
+    enum class OS
+    {
+        Windows,
+        Osx,
+        Linux,
+        FreeBsd,
+        OpenBsd
+    };
+
+    constexpr ZStringView to_zstring_view(OS os)
+    {
+        switch (os)
+        {
+            case OS::Windows: return ZStringView{"windows"}; break;
+            case OS::Linux: return ZStringView{"linux"}; break;
+            case OS::Osx: return ZStringView{"osx"}; break;
+            case OS::FreeBsd: return ZStringView{"freebsd"}; break;
+            case OS::OpenBsd: return ZStringView{"openbsd"}; break;
+            default: Checks::unreachable(VCPKG_LINE_INFO);
+        }
+    }
+
     struct ArchToolData
     {
         StringLiteral tool;
-        StringLiteral os;
+        OS os;
         Optional<CPUArchitecture> arch;
         StringLiteral version;
         StringLiteral exeRelativePath;
@@ -77,7 +99,7 @@ namespace vcpkg
     static constexpr ArchToolData tool_data_table[] = {
         {
             "python3",
-            "windows",
+            OS::Windows,
             nullopt,
             "3.11.8",
             "python.exe",
@@ -88,7 +110,7 @@ namespace vcpkg
         },
         {
             "python3_with_venv",
-            "windows",
+            OS::Windows,
             nullopt,
             "3.11.8",
             "tools/python.exe",
@@ -99,7 +121,7 @@ namespace vcpkg
         },
         {
             "cmake",
-            "windows",
+            OS::Windows,
             nullopt,
             "3.29.2",
             "cmake-3.29.2-windows-i386/bin/cmake.exe",
@@ -110,7 +132,7 @@ namespace vcpkg
         },
         {
             "cmake",
-            "osx",
+            OS::Osx,
             nullopt,
             "3.29.2",
             "cmake-3.29.2-macos-universal/CMake.app/Contents/bin/cmake",
@@ -121,7 +143,7 @@ namespace vcpkg
         },
         {
             "cmake",
-            "linux",
+            OS::Linux,
             CPUArchitecture::ARM64,
             "3.29.2",
             "cmake-3.29.2-linux-aarch64/bin/cmake",
@@ -132,7 +154,7 @@ namespace vcpkg
         },
         {
             "cmake",
-            "linux",
+            OS::Linux,
             nullopt,
             "3.29.2",
             "cmake-3.29.2-linux-x86_64/bin/cmake",
@@ -143,7 +165,7 @@ namespace vcpkg
         },
         {
             "git",
-            "windows",
+            OS::Windows,
             nullopt,
             "2.7.4",
             "mingw64/bin/git.exe",
@@ -155,7 +177,7 @@ namespace vcpkg
         },
         {
             "git",
-            "linux",
+            OS::Linux,
             nullopt,
             "2.7.4",
             "",
@@ -165,7 +187,7 @@ namespace vcpkg
         },
         {
             "git",
-            "osx",
+            OS::Osx,
             nullopt,
             "2.7.4",
             "",
@@ -175,7 +197,7 @@ namespace vcpkg
         },
         {
             "git",
-            "freebsd",
+            OS::FreeBsd,
             nullopt,
             "2.7.4",
             "",
@@ -185,7 +207,7 @@ namespace vcpkg
         },
         {
             "gsutil",
-            "windows",
+            OS::Windows,
             nullopt,
             "4.65",
             "google-cloud-sdk/bin/gsutil.cmd",
@@ -197,7 +219,7 @@ namespace vcpkg
         },
         {
             "gsutil",
-            "osx",
+            OS::Osx,
             nullopt,
             "4.65",
             "gsutil/gsutil",
@@ -208,7 +230,7 @@ namespace vcpkg
         },
         {
             "gsutil",
-            "linux",
+            OS::Linux,
             nullopt,
             "4.65",
             "gsutil/gsutil",
@@ -219,7 +241,7 @@ namespace vcpkg
         },
         {
             "vswhere",
-            "windows",
+            OS::Windows,
             nullopt,
             "3.1.7",
             "vswhere.exe",
@@ -230,7 +252,7 @@ namespace vcpkg
         },
         {
             "nuget",
-            "windows",
+            OS::Windows,
             nullopt,
             "6.10.0",
             "nuget.exe",
@@ -241,7 +263,7 @@ namespace vcpkg
         },
         {
             "nuget",
-            "linux",
+            OS::Windows,
             nullopt,
             "6.10.0",
             "nuget.exe",
@@ -252,7 +274,7 @@ namespace vcpkg
         },
         {
             "nuget",
-            "osx",
+            OS::Osx,
             nullopt,
             "6.10.0",
             "nuget.exe",
@@ -263,7 +285,7 @@ namespace vcpkg
         },
         {
             "coscli",
-            "windows",
+            OS::Windows,
             nullopt,
             "0.11.0",
             "coscli-windows.exe",
@@ -274,7 +296,7 @@ namespace vcpkg
         },
         {
             "coscli",
-            "linux",
+            OS::Linux,
             nullopt,
             "0.11.0",
             "coscli-linux",
@@ -285,7 +307,7 @@ namespace vcpkg
         },
         {
             "coscli",
-            "osx",
+            OS::Osx,
             nullopt,
             "0.11.0",
             "coscli-mac",
@@ -296,7 +318,7 @@ namespace vcpkg
         },
         {
             "installerbase",
-            "windows",
+            OS::Windows,
             nullopt,
             "4.4.0",
             "QtInstallerFramework-win-x86/bin/installerbase.exe",
@@ -308,7 +330,7 @@ namespace vcpkg
         },
         {
             "7zip_msi",
-            "windows",
+            OS::Windows,
             nullopt,
             "24.08",
             "Files/7-Zip/7z.exe",
@@ -319,7 +341,7 @@ namespace vcpkg
         },
         {
             "7zip",
-            "windows",
+            OS::Windows,
             nullopt,
             "24.08",
             "7za.exe",
@@ -330,7 +352,7 @@ namespace vcpkg
         },
         {
             "7zr",
-            "windows",
+            OS::Windows,
             nullopt,
             "24.08",
             "7zr.exe",
@@ -341,7 +363,7 @@ namespace vcpkg
         },
         {
             "aria2",
-            "windows",
+            OS::Windows,
             nullopt,
             "1.37.0",
             "aria2-1.37.0-win-64bit-build1/aria2c.exe",
@@ -352,7 +374,7 @@ namespace vcpkg
         },
         {
             "aria2",
-            "osx",
+            OS::Osx,
             nullopt,
             "1.35.0",
             "aria2-1.35.0/bin/aria2c",
@@ -363,7 +385,7 @@ namespace vcpkg
         },
         {
             "ninja",
-            "windows",
+            OS::Windows,
             nullopt,
             "1.11.1",
             "ninja.exe",
@@ -374,7 +396,7 @@ namespace vcpkg
         },
         {
             "ninja",
-            "linux",
+            OS::Linux,
             nullopt,
             "1.11.1",
             "ninja",
@@ -385,7 +407,7 @@ namespace vcpkg
         },
         {
             "ninja",
-            "osx",
+            OS::Osx,
             nullopt,
             "1.11.1",
             "ninja",
@@ -396,7 +418,7 @@ namespace vcpkg
         },
         {
             "powershell-core",
-            "windows",
+            OS::Windows,
             nullopt,
             "7.2.23",
             "pwsh.exe",
@@ -407,7 +429,7 @@ namespace vcpkg
         },
         {
             "node",
-            "windows",
+            OS::Windows,
             nullopt,
             "16.15.1",
             "node-v16.15.1-win-x64/node.exe",
@@ -418,7 +440,7 @@ namespace vcpkg
         },
         {
             "node",
-            "linux",
+            OS::Linux,
             nullopt,
             "16.15.1",
             "node-v16.15.1-linux-x64/bin/node",
@@ -429,7 +451,7 @@ namespace vcpkg
         },
         {
             "node",
-            "osx",
+            OS::Osx,
             nullopt,
             "16.15.1",
             "node-v16.15.1-darwin-x64/bin/node",
@@ -440,7 +462,7 @@ namespace vcpkg
         },
     };
 
-    static const ArchToolData* get_raw_tool_data(StringView toolname, CPUArchitecture arch, StringView os)
+    static const ArchToolData* get_raw_tool_data(StringView toolname, CPUArchitecture arch, OS os)
     {
         const ArchToolData* default_tool = nullptr;
         for (auto&& d : tool_data_table)
@@ -483,15 +505,15 @@ namespace vcpkg
     {
         auto hp = get_host_processor();
 #if defined(_WIN32)
-        auto data = get_raw_tool_data(tool, hp, "windows");
+        auto data = get_raw_tool_data(tool, hp, OS::Windows);
 #elif defined(__APPLE__)
-        auto data = get_raw_tool_data(tool, hp, "osx");
+        auto data = get_raw_tool_data(tool, hp, OS::Osx);
 #elif defined(__linux__)
-        auto data = get_raw_tool_data(tool, hp, "linux");
+        auto data = get_raw_tool_data(tool, hp, OS::Linux);
 #elif defined(__FreeBSD__)
-        auto data = get_raw_tool_data(tool, hp, "freebsd");
+        auto data = get_raw_tool_data(tool, hp, OS::FreeBsd);
 #elif defined(__OpenBSD__)
-        auto data = get_raw_tool_data(tool, hp, "openbsd");
+        auto data = get_raw_tool_data(tool, hp, OS::OpenBsd);
 #else
         return nullopt;
 #endif
@@ -506,7 +528,7 @@ namespace vcpkg
                                msg::tool_name = tool,
                                msg::version = data->version);
 
-        Path tool_dir_name = fmt::format("{}-{}-{}", tool, data->version, data->os);
+        Path tool_dir_name = fmt::format("{}-{}-{}", tool, data->version, to_zstring_view(data->os));
         Path download_subpath;
         if (!data->archiveName.empty())
         {
