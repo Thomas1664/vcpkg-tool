@@ -507,7 +507,7 @@ namespace vcpkg
         auto result = cmd_execute_and_stream_lines(cmd, settings, [&code](StringView line) {
             if (Strings::starts_with(line, guid_marker))
             {
-                code = std::strtol(line.data() + guid_marker.size(), nullptr, 10);
+                code = static_cast<int>(std::strtol(line.data() + guid_marker.size(), nullptr, 10));
             }
             else
             {
@@ -568,7 +568,7 @@ namespace vcpkg
         auto res = cmd_execute_and_stream_lines(http_cmd, [&code](StringView line) {
             if (Strings::starts_with(line, guid_marker))
             {
-                code = std::strtol(line.data() + guid_marker.size(), nullptr, 10);
+                code = static_cast<int>(std::strtol(line.data() + guid_marker.size(), nullptr, 10));
             }
         });
 
